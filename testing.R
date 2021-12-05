@@ -88,8 +88,8 @@ tickers = spl('SUSA,AGG,XLY,XLP,XLE,XLF,XLV,XLI,XLB,XLK,XLU,IWB,IWD,IWF,IWM,IWN,
 #tickers = spl('SUSA,IWM,AGG')
 
 data <- new.env()
-getSymbols(tickers, src = 'yahoo', from = '2020-01-01', env = data, auto.assign = T)
-bt.prep(data, align='keep.all', dates='2020::2021')
+getSymbols(tickers, src = 'yahoo', from = '2015-01-01', env = data, auto.assign = T)
+bt.prep(data, align='keep.all', dates='2015::2021')
 
 #*****************************************************************
 # Code Strategies
@@ -110,23 +110,51 @@ equal.weight = bt.run(data, type='share')
 
 
 # Rank on 6 month return
-position.score = prices / mlag(prices, 140)    
+position.score.100 = prices / mlag(prices, 100)
+position.score.120 = prices / mlag(prices, 120)
+position.score.140 = prices / mlag(prices, 140)
+position.score.150 = prices / mlag(prices, 150)
+position.score.160 = prices / mlag(prices, 160)
+position.score.180 = prices / mlag(prices, 180)
 
-# Select Top 2 funds
+# Seletop Top 3 funds,  and Keep then till they are in 1:6 rank, 100
 data$weight[] = NA
-data$weight[month.ends,] = ntop(position.score[month.ends,], 3)    
+data$weight[month.ends,] = ntop.keep(position.score.100[month.ends,], 3, 6)    
 capital = 100000
 data$weight[] = (capital / prices) * bt.exrem(data$weight)        
-top3 = bt.run(data, type='share', trade.summary=T)
-
-# Seletop Top 3 funds,  and Keep then till they are in 1:6 rank
+score100 = bt.run(data, type='share', trade.summary=T)
+# Seletop Top 3 funds,  and Keep then till they are in 1:6 rank, 120
 data$weight[] = NA
-data$weight[month.ends,] = ntop.keep(position.score[month.ends,], 3, 6)    
+data$weight[month.ends,] = ntop.keep(position.score.120[month.ends,], 3, 6)    
 capital = 100000
 data$weight[] = (capital / prices) * bt.exrem(data$weight)        
-top3.keep6 = bt.run(data, type='share', trade.summary=T)
+score120 = bt.run(data, type='share', trade.summary=T)
+# Seletop Top 3 funds,  and Keep then till they are in 1:6 rank, 140
+data$weight[] = NA
+data$weight[month.ends,] = ntop.keep(position.score.140[month.ends,], 3, 6)    
+capital = 100000
+data$weight[] = (capital / prices) * bt.exrem(data$weight)        
+score140 = bt.run(data, type='share', trade.summary=T)
+# Seletop Top 3 funds,  and Keep then till they are in 1:6 rank, 150
+data$weight[] = NA
+data$weight[month.ends,] = ntop.keep(position.score.150[month.ends,], 3, 6)    
+capital = 100000
+data$weight[] = (capital / prices) * bt.exrem(data$weight)        
+score150 = bt.run(data, type='share', trade.summary=T)
+# Seletop Top 3 funds,  and Keep then till they are in 1:6 rank, 160
+data$weight[] = NA
+data$weight[month.ends,] = ntop.keep(position.score.160[month.ends,], 3, 6)    
+capital = 100000
+data$weight[] = (capital / prices) * bt.exrem(data$weight)        
+score160 = bt.run(data, type='share', trade.summary=T)
+# Seletop Top 3 funds,  and Keep then till they are in 1:6 rank, 180
+data$weight[] = NA
+data$weight[month.ends,] = ntop.keep(position.score.180[month.ends,], 3, 6)    
+capital = 100000
+data$weight[] = (capital / prices) * bt.exrem(data$weight)        
+score180 = bt.run(data, type='share', trade.summary=T)
 
 #*****************************************************************
 # Create Report
 #****************************************************************** 
-plotbt.custom.report(top3.keep6, top3, equal.weight, trade.summary=T)
+plotbt.custom.report(score100,score120,score140,score150,score160,score180, trade.summary=T)
